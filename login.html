@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->  
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->  
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->  
+<head>
+    <title>测试日报质量平台——登录</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="renderer" content="webkit">
+    <meta name="author" content="">
+
+    <!-- Favicon -->
+    <!-- <link rel="shortcut icon" href="favicon.ico"> -->
+
+    <!-- Web Fonts -->
+    <link rel='stylesheet' type='text/css' href='assets/css/css.css'>
+
+    <!-- CSS Global Compulsory -->
+    <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <!-- CSS Implementing Plugins -->
+    <link rel="stylesheet" href="assets/plugins/animate.css">
+    <link rel="stylesheet" href="assets/plugins/line-icons/line-icons.css">
+    <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.min.css">
+
+    <!-- CSS Page Style -->    
+    <link rel="stylesheet" href="assets/css/page_log.css">    
+
+    <!-- CSS Theme -->    
+    <link rel="stylesheet" href="assets/css/blue.css" id="style_color">
+
+    <!-- CSS Customization -->
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="stylesheet" href="assets/plugins/iview/iview.css">
+    <link href="assets/plugins/ionicons/css/ionicons.css" rel="stylesheet">
+    <style type="text/css">
+      .btn-u:hover{
+        background: #40E0D0 !important;
+        color: #fff !important;
+      }
+    </style>
+</head> 
+
+<body>
+
+<!--=== Content Part ===-->    
+<div id="app" class="container">
+    <!--Reg Block-->
+    <div class="reg-block">
+        <div class="reg-block-header">
+            <h2>测试日报质量平台</h2>     
+        </div>
+
+        <div class="input-group margin-bottom-20">
+            <span class="input-group-addon">用户标识</span>
+            <input type="text" v-model="userName" class="form-control" placeholder="RTC">
+        </div>
+        <div class="input-group margin-bottom-20">
+            <span class="input-group-addon">密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码</span>
+            <input type="password" v-model="passWord" class="form-control" placeholder="Password">
+        </div>
+        <hr>
+
+        <div class="checkbox">
+            <label style="padding-left: 0px;">
+                <Checkbox v-model="autologin" @on-change="autologinFc" style="padding-left: 0px;">下次自动登录</Checkbox>
+            </label>            
+        </div>
+                                
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <button type="submit" class="btn-u btn-block" @click="userland">登录</button>
+            </div>
+        </div>
+        <div style="text-align: right;margin-top: 10px;">
+            <p>软件与服务中心</p>
+        </div>
+    </div>
+    <!--End Reg Block-->
+</div><!--/container-->
+<!--=== End Content Part ===-->
+
+<!-- JS Global Compulsory -->
+<script type="text/javascript" src="assets/js/vue.js"></script>
+<script src="assets/plugins/iview/iview.min.js"></script>           
+<script type="text/javascript" src="assets/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="assets/plugins/jquery/jquery-migrate.min.js"></script>
+<script type="text/javascript" src="assets/plugins/bootstrap/js/bootstrap.min.js"></script> 
+<!-- JS Implementing Plugins -->           
+<script type="text/javascript" src="assets/plugins/back-to-top.js"></script>
+<script type="text/javascript" src="assets/plugins/backstretch/jquery.backstretch.min.js"></script>
+<!-- JS Customization -->
+<script type="text/javascript" src="assets/js/custom.js"></script>
+<!-- JS Page Level -->           
+<script type="text/javascript" src="assets/js/app.js"></script>
+<!--[if lt IE 9]>
+    <script src="assets/plugins/respond.js"></script>
+    <script src="assets/plugins/html5shiv.js"></script>
+    <script src="assets/plugins/placeholder-IE-fixes.js"></script>
+<![endif]-->
+<script type="text/javascript">
+  	new Vue({
+	  el: '#app',
+	  data: {
+	  	autologin: false,
+	    userName: '',
+	    passWord: ''
+	  },
+	  mounted () {
+	  	if (sessionStorage.getItem('autologin', this.autologin) === 'true') {
+	  		this.autologin = true
+	  		this.userName = sessionStorage.getItem('userName', this.userName)
+			this.passWord = sessionStorage.getItem('passWord', this.passWord)
+	  	}
+	  },
+	  methods: {
+	    userland: function () {
+	    	if (this.userName === '' || this.passWord === '') {
+	    		this.$Notice.error({
+                    title: '用户名或密码不能为空',
+                    desc: ''
+                })
+	    	} else {
+	    		let params = {
+	    			username: this.userName,
+	    			password: this.passWord
+	    		}
+	    		let that = this
+		        $.ajax({
+				  type: 'POST',
+				  url: '/api/PTJ/user/login.do',
+				  data: JSON.stringify(params),
+				  contentType: 'text/plain',
+				  success: function(data){
+		            if (data.status === 0) {
+		            	let authority = data.data.authorityid
+		            	sessionStorage.setItem('authorityid', authority)
+		            	that.autologinFc()
+                        sessionStorage.setItem('userId', data.data.id)
+		            	window.location.pathname = 'index.html'
+		            } else {
+                        that.$Notice.error({
+                            title: data.msg,
+                            desc: ''
+                        })
+                    }
+		          },
+		          error: function(){
+		          	console.log('error')
+		          }
+				})
+	    	}
+        },
+        autologinFc: function () {
+        	if ( this.autologin === true) {
+        		sessionStorage.setItem('userName', this.userName)
+        		sessionStorage.setItem('passWord', this.passWord)
+        		sessionStorage.setItem('autologin', this.autologin)
+        	} else {
+        		sessionStorage.removeItem('userName', this.userName)
+        		sessionStorage.removeItem('passWord', this.passWord)
+        		sessionStorage.removeItem('autologin', this.autologin)
+        	}
+        }
+	  }
+	})
+  </script>
+</body>
+</html> 

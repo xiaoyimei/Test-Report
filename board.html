@@ -1,0 +1,1361 @@
+<!DOCTYPE html> 
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->  
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->  
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->  
+<head>
+    <title>看板</title>
+
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="renderer" content="webkit">
+    <meta name="author" content="">
+    <!-- Favicon -->
+    <!-- <link rel="shortcut icon" href="favicon.ico"> -->
+    <!-- Web Fonts -->
+    <link rel="stylesheet" href="assets/css/css.css">
+
+    <!-- CSS Global Compulsory -->
+    <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/plugins/animate.css">
+    <link rel="stylesheet" href="assets/plugins/font-awesome/css/font-awesome.min.css">
+    <!-- CSS Theme -->    
+    <link rel="stylesheet" href="assets/css/blue.css" id="style_color">
+    <link rel="stylesheet" href="assets/plugins/iview/iview.css">
+    <link href="assets/plugins/ionicons/css/ionicons.css" rel="stylesheet">
+    <style type="text/css">
+	  .btn-u-small:hover{
+	  	background: #40E0D0 !important;
+	  	color: #fff !important;
+	  }
+	</style>
+</head>
+
+<body>
+<div id="app">
+  <div class="wrapper">
+    	<!--=== Breadcrumbs ===-->
+    <div class="breadcrumbs" style="background-color: rgba(22, 155, 213, 1);height: 60px;">
+        <div class="container" style="width: 100%;">
+            <h1 class="pull-left" style="color: #fff;margin-top: 10px;">测试日报质量平台</h1>
+            <span class="pull-right" style="margin-top: 14px;font-size: 16px;"><span style="color: #fff;margin-right: 50px;">{{nowTime}}</span><span style="color: #fff;margin-right: 50px;">{{userName}}</span><i-button @click="modal0 = true">退出</i-button></span>
+        </div>
+    </div><!--/breadcrumbs-->
+    <!--=== End Breadcrumbs ===-->
+    <div style="background-color: rgba(242, 242, 242, 1);">
+    	<div style="padding-top: 15px;padding-bottom: 15px;">
+    		<span><i-button style="margin-left: 50px;" @click="goBack">返回</i-button><label style="font-size: 2em;margin-left: 28%;">{{proname}}项目质量看板</label></span>
+    	</div>
+	</div>
+    <!-- <div style="width: 80%;margin-left: 10%;"> -->
+    	<!-- <div style="margin-top: 10px;font-size: 14px;margin-bottom: 10px;">
+    		<span>交付物名称/版本：{{deliverable}}</span><span style="margin-left: 16%;">基线时间：{{Baselinetime}}</span><span style="margin-left: 16%;">当前测试版本数：{{Versionnumber}}</span><span style="margin-left: 16%;">所属大项目群：{{group}}</span>
+    	</div> -->
+    	<!-- <div style="margin-top: 20px;">
+    		<i-table border :columns="columns0" :data="data0"></i-table>
+    	</div> -->
+    <!-- </div> -->
+    <div>
+    	<div style="padding-top: 15px;padding-bottom: 15px;margin-left: 10%;font-size: 14px;">
+    		<span>项目测试结论：<i-button style="width:100px;">{{Testresult}}</i-button><label style="font-weight: normal;margin-left: 10%;">项目当前风险及障碍：{{prorisk}}</label></span>
+    	</div>
+	</div>
+	<i-row>
+		<i-col span="8" offset="1">
+			<div style="text-align: center;margin-top: 10px;">
+				<span><i-button :type="isonclickleft0" @click="onclickleft0">累计发现bug数</i-button><i-button style="margin-left: 20px;" :type="isonclickleft1" @click="onclickleft1">当前遗留bug数</i-button></span>
+			</div>
+			<div style="margin-top: 10px;">
+				<i-row>
+					<i-col span="12" v-show="isFunction">
+						<div id="left0" style="width: 250px;height:200px;"></div>
+					</i-col>
+					<i-col span="12" v-show="isCode">
+						<div id="left1" style="width: 250px;height:200px;"></div>
+					</i-col>
+				</i-row>
+				<i-row>
+					<i-col span="12" v-show="isProperty">
+						<div id="left2" style="width: 250px;height:200px;"></div>
+					</i-col>
+					<i-col span="12" v-show="isSecurity">
+						<div id="left3" style="width: 250px;height:200px;"></div>
+					</i-col>
+				</i-row>
+			</div>
+		</i-col>
+		<i-col span="14" style="border-left: 2px dashed #555;">
+		   <div style="margin-left: 5%;">
+			<div style="margin-top: 10px;">
+				<div>
+				   <div style="display: inline-block;">
+					  <i-button :type="isonclickright0" @click="onclickright0">按基线</i-button><i-button style="margin-left: 20px;" :type="isonclickright1" @click="onclickright1">按时间</i-button>
+				   </div>
+				   <div v-show="isonclick" style="display: inline-block;margin-left: 40px;"><i class="fa fa-calendar fa-2x" aria-hidden="true" style="vertical-align:-20%;"></i></div>
+					<div style="display: inline-block;margin-left: 5px;"><i-select @on-change="changeTime" v-model="selecttime" style="width:100px" v-show="isonclick">
+				        <i-option v-for="item in timeList" :value="item.value" :key="item.value">{{ item.label }}</i-option>
+				        </i-select><date-picker v-model="searchTime.all" v-show="isuserdefined && isonclick" type="daterange" @on-change="ChangeDate" @on-ok="confirmDate" @on-clear="ClearDate" confirm placement="bottom-end" placeholder="请选择日期" style="width: 220px;margin-left: 5px;"></date-picker>
+				    </div>
+			    </div>
+			</div>
+			<div id="Bar" style="margin-top: 10px;" v-show="Isbaseline">
+				<i-row>
+					<i-col span="12" v-show="isFunction">
+						<div id="right0" style="width: 360px;height:200px;"></div>
+					</i-col>
+					<i-col span="12" v-show="isCode">
+						<div id="right1" style="width: 360px;height:200px;"></div>
+					</i-col>
+				</i-row>
+				<i-row>
+					<i-col span="12" v-show="isProperty">
+						<div id="right2" style="width: 360px;height:200px;"></div>
+					</i-col>
+					<i-col span="12" v-show="isSecurity">
+						<div id="right3" style="width: 360px;height:200px;"></div>
+					</i-col>
+				</i-row>
+			</div>
+			<div id="Line" style="margin-top: 10px;" v-show="!Isbaseline">
+				<i-row>
+					<i-col span="12" v-show="isFunction">
+						<div id="right4" style="width: 360px;height:200px;"></div>
+					</i-col>
+					<i-col span="12" v-show="isCode">
+						<div id="right5" style="width: 360px;height:200px;"></div>
+					</i-col>
+				</i-row>
+				<i-row>
+					<i-col span="12" v-show="isProperty">
+						<div id="right6" style="width: 360px;height:200px;"></div>
+					</i-col>
+					<i-col span="12" v-show="isSecurity">
+						<div id="right7" style="width: 360px;height:200px;"></div>
+					</i-col>
+				</i-row>
+			</div>
+		  </div>
+		</i-col>
+	</i-row>
+  </div>
+  <Modal
+        v-model="modal0"
+        title="提示"
+        @on-ok="ok"
+        @on-cancel="cancel">
+        <p>您可能有数据没有保存，确认退出吗？</p>
+    <Modal>
+</div>
+  <script type="text/javascript" src="assets/js/vue.js"></script>
+  <script src="assets/plugins/iview/iview.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/jquery/jquery-migrate.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="assets/plugins/echarts/echarts.js"></script>
+  <script type="text/javascript">
+  	new Vue({
+	  el: '#app',
+	  data: {
+	  	isonclick: true,
+	  	isuserdefined: false,
+	  	searchTime: {
+	  		all: '',
+	  		start: '1949-01-01',
+	  		end: '2049-01-01'
+	    },
+	  	isFunction: false,
+	  	isCode: false,
+	  	isProperty: false,
+        isSecurity: false,
+	  	modal0: false,
+	    nowTime: '',
+	    userName: '',
+	    proname: 'XXXX',
+	    deliverable: 'XXX',
+	    Baselinetime: 'XX年XX月XX日',
+	    Versionnumber: 'XXX',
+	    group: 'XXX',
+	    Testresult: '测试中',
+	    prorisk: '当前存在延期风险',
+	    isonclickleft0: 'primary',
+	    isonclickleft1: 'ghost',
+	    charts: '',
+        opinionleft0:['A级','B级','C级','D级'],
+        opinionDataleft0:[
+          {value:null, name:'A级'},
+          {value:null, name:'B级'},
+          {value:null, name:'C级'},
+          {value:null, name:'D级'}
+        ],
+        opinionleft1:['A级','B级'],
+        opinionDataleft1:[
+          {value:null, name:'A级'},
+          {value:null, name:'B级'}
+        ],
+        opinionleft2:['云端性能','web性能'],
+        opinionDataleft2:[
+          {value:null, name:'云端性能'},
+          {value:null, name:'web性能'}
+        ],
+        opinionleft3:['高危','中危','低危'],
+        opinionDataleft3:[
+          {value:null, name:'高危'},
+          {value:null, name:'中危'},
+          {value:null, name:'低危'}
+        ],
+        isonclickright0: 'ghost',
+	    isonclickright1: 'primary',
+	    selecttime: '全部',
+	    timeList: [
+            {
+                value: '全部',
+                label: '全部'
+            },
+            {
+                value: '自定义',
+                label: '自定义'
+            }
+        ],
+        Isbaseline: false,
+        opinionright4: [],
+        opinionDataright4: [
+	        {
+	            name:'累计发现bug数',
+	            type:'line',
+	            data:[]
+	        },
+	        {
+	            name:'累计遗留bug数',
+	            type:'line',
+	            data:[]
+	        }
+	     ],
+	    opinionright5: [],
+        opinionDataright5: [
+	        {
+	            name:'累计发现bug数',
+	            type:'line',
+	            data:[]
+	        },
+	        {
+	            name:'累计遗留bug数',
+	            type:'line',
+	            data:[]
+	        }
+	     ],
+	    opinionright6: [],
+        opinionDataright6: [
+	        {
+	            name:'累计发现bug数',
+	            type:'line',
+	            data:[]
+	        },
+	        {
+	            name:'累计遗留bug数',
+	            type:'line',
+	            data:[]
+	        }
+	     ],
+	    opinionright7: [],
+        opinionDataright7: [
+	        {
+	            name:'累计发现bug数',
+	            type:'line',
+	            data:[]
+	        },
+	        {
+	            name:'累计遗留bug数',
+	            type:'line',
+	            data:[]
+	        }
+	     ],
+	     bardata0: [],
+	     barlenged0: [],
+	     barseries0: [],
+	     bardata1: [],
+	     barlenged1: [],
+	     barseries1: [],
+	     bardata2: [],
+	     barlenged2: [],
+	     barseries2: [],
+	     bardata3: [],
+	     barlenged3: [],
+	     barseries3: [],
+	     piedatafunctionJournal: {
+            bugASum: null,
+            bugBSum: null,
+            bugCSum: null,
+            bugDSum: null,
+            bugARemain: null,
+            bugBRemain: null,
+            bugCRemain: null,
+            bugDRemain: null
+	     },
+	     piedatacodeJournal: {
+            bugASum: null,
+            bugBSum: null,
+            bugARemain: null,
+            bugBRemain: null
+	     },
+	     piedatapropertyJournal: {
+            cloudFailSum: null,
+            webFailSum: null
+	     },
+	     piedatasecurityJournal: {
+            bugHSum: null,
+            bugMSum: null,
+            bugLSum: null,
+            bugHRemain: null,
+            bugMRemain: null,
+            bugLRemain: null
+	     }
+	  },
+	  mounted () {
+	  	this.userName = sessionStorage.getItem('userName')
+	    this.getNowDate()
+	    let id = sessionStorage.getItem('projectid')
+	    this.proname = sessionStorage.getItem('projectname')
+	    let params = {
+	    	projectId: id,
+	    	startTime: null,
+	    	endTime: null
+	    }
+	    let that = this
+	    $.ajax({
+		  type: 'POST',
+		  url: '/api/PTJ/journal/last.do',
+		  data: JSON.stringify(params),
+		  contentType: 'text/plain',
+		  success: function(data){
+               if (data.status === 0) {
+               	    that.prorisk = data.data.projectJournal.description
+	               	if (data.data.state === 1) {
+	               		that.Testresult = '测试执行'
+	               	} else if (data.data.state === 2) {
+	               		that.Testresult = '测试完成'
+	               	}
+	               	if (data.data.isFunction === 1) {
+	               		that.isFunction = true
+	               		that.opinionDataleft0[0].value = data.data.functionJournal.bugASum
+	               		that.opinionDataleft0[1].value = data.data.functionJournal.bugBSum
+	               		that.opinionDataleft0[2].value = data.data.functionJournal.bugCSum
+	               		that.opinionDataleft0[3].value = data.data.functionJournal.bugDSum
+	               		that.piedatafunctionJournal.bugASum = data.data.functionJournal.bugASum
+	               		that.piedatafunctionJournal.bugBSum = data.data.functionJournal.bugBSum
+	               		that.piedatafunctionJournal.bugCSum = data.data.functionJournal.bugCSum
+	               		that.piedatafunctionJournal.bugDSum = data.data.functionJournal.bugDSum
+	               		that.piedatafunctionJournal.bugARemain = data.data.functionJournal.bugARemain
+	               		that.piedatafunctionJournal.bugBRemain = data.data.functionJournal.bugBRemain
+	               		that.piedatafunctionJournal.bugCRemain = data.data.functionJournal.bugCRemain
+	               		that.piedatafunctionJournal.bugDRemain = data.data.functionJournal.bugDRemain
+	               		that.$nextTick(function() {
+				            that.drawPie0('left0')
+				        })
+	               	}
+                    if (data.data.isCode === 1) {
+	               		that.isCode = true
+	               		that.opinionDataleft1[0].value = data.data.codeJournal.bugASum
+	               		that.opinionDataleft1[1].value = data.data.codeJournal.bugBSum
+	               		that.piedatacodeJournal.bugASum = data.data.codeJournal.bugASum
+	               		that.piedatacodeJournal.bugBSum = data.data.codeJournal.bugBSum
+	               		that.piedatacodeJournal.bugARemain = data.data.codeJournal.bugARemain
+	               		that.piedatacodeJournal.bugBRemain = data.data.codeJournal.bugBRemain
+
+	               		that.$nextTick(function() {
+				            that.drawPie1('left1')
+				        })
+	               	}
+	               	if (data.data.isProperty === 1) {
+	               		that.isProperty = true
+	               		that.opinionDataleft2[0].value = data.data.propertyJournal.cloudFailSum
+	               		that.opinionDataleft2[1].value = data.data.propertyJournal.webFailSum
+	               		that.piedatapropertyJournal.cloudFailSum = data.data.propertyJournal.cloudFailSum
+	               		that.piedatapropertyJournal.webFailSum = data.data.propertyJournal.webFailSum
+	               		that.$nextTick(function() {
+				            that.drawPie2('left2')
+				        })
+	               	}
+	               	if (data.data.isSecurity === 1) {
+	               		that.isSecurity = true
+	               		that.opinionDataleft3[0].value = data.data.securityJournal.bugHSum
+	               		that.opinionDataleft3[1].value = data.data.securityJournal.bugMSum
+	               		that.opinionDataleft3[2].value = data.data.securityJournal.bugLSum
+	               		that.piedatasecurityJournal.bugHSum = data.data.securityJournal.bugHSum
+	               		that.piedatasecurityJournal.bugMSum = data.data.securityJournal.bugMSum
+	               		that.piedatasecurityJournal.bugLSum = data.data.securityJournal.bugLSum
+	               		that.piedatasecurityJournal.bugHRemain = data.data.securityJournal.bugHRemain
+	               		that.piedatasecurityJournal.bugMRemain = data.data.securityJournal.bugMRemain
+	               		that.piedatasecurityJournal.bugLRemain = data.data.securityJournal.bugLRemain
+	               		 that.$nextTick(function() {
+				            that.drawPie3('left3')
+				        })
+	               	}
+	               	if (that.isFunction === true) {
+			        	that.linefunction()
+			        	that.barfunction()
+			        }
+			        if (that.isCode === true) {
+			        	that.linecode()
+			        	that.barcode()
+			        }
+			        if (that.isProperty === true) {
+			        	that.lineproperty()
+			        	that.barproperty()
+			        }
+			        if (that.isSecurity === true) {
+			        	that.linesecurity()
+			        	that.barsecurity()
+			        }
+               }  else if (data.status === 10) {
+               	  that.$Notice.warning({
+                    title: '登录超时',
+                    desc: '用户登录超时，即将跳转到登录页面'
+                  })
+                  setTimeout(that.userout(), 5000)
+           		}
+          },
+          error: function(){
+          	console.log('error')
+          }
+		})
+	  },
+	  methods: {
+	  	barfunction () {
+	  	   let id = sessionStorage.getItem('projectid')
+           let projectId = 'projectId=' + id
+           let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/statistics/baseline/function.do',
+			  data: projectId,
+			  contentType: 'application/x-www-form-urlencoded',
+			  success: function(data){
+	               if (data.status === 0) {
+	               	 that.bardata0 = data.data.xAxis.data,
+	     			 that.barseries0 = data.data.yAxis.series
+                     for (let i=0;i<data.data.yAxis.series.length;i++) {
+                     	that.barlenged0.push(data.data.yAxis.series[i].name)
+                     }
+	     			 that.$nextTick(function() {
+			            that.drawbar0('right0')
+			         })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	barcode () {
+	  	   let id = sessionStorage.getItem('projectid')
+           let projectId = 'projectId=' + id
+           let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/statistics/baseline/code.do',
+			  data: projectId,
+			  contentType: 'application/x-www-form-urlencoded',
+			  success: function(data){
+	               if (data.status === 0) {
+	               	 that.bardata1 = data.data.xAxis.data,
+	     			 that.barseries1 = data.data.yAxis.series
+                     for (let i=0;i<data.data.yAxis.series.length;i++) {
+                     	that.barlenged1.push(data.data.yAxis.series[i].name)
+                     }
+	     			 that.$nextTick(function() {
+			            that.drawbar1('right1')
+			         })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	barproperty () {
+	  	   let id = sessionStorage.getItem('projectid')
+           let projectId = 'projectId=' + id
+           let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/statistics/baseline/property.do',
+			  data: projectId,
+			  contentType: 'application/x-www-form-urlencoded',
+			  success: function(data){
+	               if (data.status === 0) {
+	               	 that.bardata2 = data.data.xAxis.data,
+	     			 that.barseries2 = data.data.yAxis.series
+                     for (let i=0;i<data.data.yAxis.series.length;i++) {
+                     	that.barlenged2.push(data.data.yAxis.series[i].name)
+                     }
+	     			 that.$nextTick(function() {
+			            that.drawbar2('right2')
+			         })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	barsecurity () {
+	  	   let id = sessionStorage.getItem('projectid')
+           let projectId = 'projectId=' + id
+           let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/statistics/baseline/security.do',
+			  data: projectId,
+			  contentType: 'application/x-www-form-urlencoded',
+			  success: function(data){
+	               if (data.status === 0) {
+	               	 that.bardata3 = data.data.xAxis.data,
+	     			 that.barseries3 = data.data.yAxis.series
+                     for (let i=0;i<data.data.yAxis.series.length;i++) {
+                     	that.barlenged3.push(data.data.yAxis.series[i].name)
+                     }
+	     			 that.$nextTick(function() {
+			            that.drawbar3('right3')
+			         })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	linefunction () {
+            let id = sessionStorage.getItem('projectid')
+            let params = {
+		    	projectId: id,
+		    	startTime: this.searchTime.start,
+		    	endTime: this.searchTime.end
+		    }
+		    let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/journal/functionCumulation.do',
+			  data: JSON.stringify(params),
+			  contentType: 'text/plain',
+			  success: function(data){
+	               if (data.status === 0) {
+	               	  that.opinionright4 = data.data.times
+                      that.opinionDataright4[0].data = data.data.sums
+                      that.opinionDataright4[1].data = data.data.remains
+                      that.$nextTick(function() {
+			            that.drawLine0('right4')
+			          })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	linecode () {
+            let id = sessionStorage.getItem('projectid')
+            let params = {
+		    	projectId: id,
+		    	startTime: this.searchTime.start,
+		    	endTime: this.searchTime.end
+		    }
+		    let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/journal/codeCumulation.do',
+			  data: JSON.stringify(params),
+			  contentType: 'text/plain',
+			  success: function(data){
+	               if (data.status === 0) {
+                     that.opinionright5 = data.data.times
+                     that.opinionDataright5[0].data = data.data.sums
+                     that.opinionDataright5[1].data = data.data.remains
+                     that.$nextTick(function() {
+			            that.drawLine1('right5')
+			        })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	lineproperty () {
+            let id = sessionStorage.getItem('projectid')
+            let params = {
+		    	projectId: id,
+		    	startTime: this.searchTime.start,
+		    	endTime: this.searchTime.end
+		    }
+		    let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/journal/propertyCumulation.do',
+			  data: JSON.stringify(params),
+			  contentType: 'text/plain',
+			  success: function(data){
+	               if (data.status === 0) {
+                     that.opinionright6 = data.data.times
+                     that.opinionDataright6[0].data = data.data.sums
+                     that.opinionDataright6[1].data = data.data.remains
+                     that.$nextTick(function() {
+			            that.drawLine2('right6')
+			        })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+	  	linesecurity () {
+            let id = sessionStorage.getItem('projectid')
+            let params = {
+		    	projectId: id,
+		    	startTime: this.searchTime.start,
+		    	endTime: this.searchTime.end
+		    }
+		    let that = this
+			$.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/journal/securityCumulation.do',
+			  data: JSON.stringify(params),
+			  contentType: 'text/plain',
+			  success: function(data){
+	               if (data.status === 0) {
+                     that.opinionright7 = data.data.times
+                     that.opinionDataright7[0].data = data.data.sums
+                     that.opinionDataright7[1].data = data.data.remains
+                     that.$nextTick(function() {
+			            that.drawLine3('right7')
+			        })
+	               }
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+	  	},
+        getNowDate: function () {
+	      setInterval(() => {
+	        var date = new Date()
+	        var seperator1 = '-'
+	        var seperator2 = ':'
+	        var month = date.getMonth() + 1
+	        var strDate = date.getDate()
+	        var hours = date.getHours()
+	        var minutes = date.getMinutes()
+	        var seconds = date.getSeconds()
+	        if (month >= 1 && month <= 9) {
+	          month = '0' + month
+	        }
+	        if (strDate >= 0 && strDate <= 9) {
+	          strDate = '0' + strDate
+	        }
+	        if (hours >= 0 && hours <= 9) {
+	          hours = '0' + hours
+	        }
+	        if (minutes >= 0 && minutes <= 9) {
+	          minutes = '0' + minutes
+	        }
+	        if (seconds >= 0 && seconds <= 9) {
+	          seconds = '0' + seconds
+	        }
+	        var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate +
+	           ' ' + hours + seperator2 + minutes +
+	           seperator2 + seconds
+	        this.nowTime = currentdate
+	      }, 1000)
+	    },
+	    changeTime: function () {
+	    	if (this.selecttime === '自定义') {
+	    		this.isuserdefined = true
+	    	} else {
+	    		this.searchTime.start = '1949-01-01'
+	    		this.searchTime.end = '2049-01-01'
+	    		this.isuserdefined = false
+	    		if (this.isFunction === true) {
+		        	this.linefunction()
+		        }
+		        if (this.isCode === true) {
+		        	this.linecode()
+		        }
+		        if (this.isProperty === true) {
+		        	this.lineproperty()
+		        }
+		        if (this.isSecurity === true) {
+		        	this.linesecurity()
+		        }
+	    	}
+        },
+        ChangeDate (daterange) {
+        	this.searchTime.all = daterange
+        	this.searchTime.start = this.searchTime.all[0]
+        	this.searchTime.end = this.searchTime.all[1]
+        },
+        confirmDate () {
+            if (this.isFunction === true) {
+	        	this.linefunction()
+	        }
+	        if (this.isCode === true) {
+	        	this.linecode()
+	        }
+	        if (this.isProperty === true) {
+	        	this.lineproperty()
+	        }
+	        if (this.isSecurity === true) {
+	        	this.linesecurity()
+	        }
+        },
+        ClearDate () {
+         //    this.searchTime.start = null
+        	// this.searchTime.end = null
+        },
+        onclickleft0: function () {
+            this.isonclickleft0 = 'primary'
+            this.isonclickleft1 = 'ghost'
+            this.opinionDataleft0[0].value = this.piedatafunctionJournal.bugASum
+       		this.opinionDataleft0[1].value = this.piedatafunctionJournal.bugBSum
+       		this.opinionDataleft0[2].value = this.piedatafunctionJournal.bugCSum
+       		this.opinionDataleft0[3].value = this.piedatafunctionJournal.bugDSum
+       		this.opinionDataleft1[0].value = this.piedatacodeJournal.bugASum
+       		this.opinionDataleft1[1].value = this.piedatacodeJournal.bugBSum
+       		this.opinionDataleft2[0].value = this.piedatapropertyJournal.cloudFailSum
+       		this.opinionDataleft2[1].value = this.piedatapropertyJournal.webFailSum
+       		this.opinionDataleft3[0].value = this.piedatasecurityJournal.bugHSum
+       		this.opinionDataleft3[1].value = this.piedatasecurityJournal.bugMSum
+       		this.opinionDataleft3[2].value = this.piedatasecurityJournal.bugLSum
+       		echarts.dispose(document.getElementById("left0"))
+       		echarts.dispose(document.getElementById("left1"))
+       		echarts.dispose(document.getElementById("left2"))
+       		echarts.dispose(document.getElementById("left3"))
+       		this.$nextTick(function() {
+	            this.drawPie0('left0')
+	        })
+	        this.$nextTick(function() {
+	            this.drawPie1('left1')
+	        })
+	        this.$nextTick(function() {
+	            this.drawPie2('left2')
+	        })
+	        this.$nextTick(function() {
+	            this.drawPie3('left3')
+	        })
+        },
+        onclickleft1: function () {
+            this.isonclickleft0 = 'ghost'
+            this.isonclickleft1 = 'primary'
+            this.opinionDataleft0[0].value = this.piedatafunctionJournal.bugARemain
+       		this.opinionDataleft0[1].value = this.piedatafunctionJournal.bugBRemain
+       		this.opinionDataleft0[2].value = this.piedatafunctionJournal.bugCRemain
+       		this.opinionDataleft0[3].value = this.piedatafunctionJournal.bugDRemain
+       		this.opinionDataleft1[0].value = this.piedatacodeJournal.bugARemain
+       		this.opinionDataleft1[1].value = this.piedatacodeJournal.bugBRemain
+       		this.opinionDataleft2[0].value = this.piedatapropertyJournal.cloudFailSum
+       		this.opinionDataleft2[1].value = this.piedatapropertyJournal.webFailSum
+       		this.opinionDataleft3[0].value = this.piedatasecurityJournal.bugHRemain
+       		this.opinionDataleft3[1].value = this.piedatasecurityJournal.bugMRemain
+       		this.opinionDataleft3[2].value = this.piedatasecurityJournal.bugLRemain
+       		echarts.dispose(document.getElementById("left0"))
+       		echarts.dispose(document.getElementById("left1"))
+       		echarts.dispose(document.getElementById("left2"))
+       		echarts.dispose(document.getElementById("left3"))
+       		this.$nextTick(function() {
+	            this.drawPie0('left0')
+	        })
+	        this.$nextTick(function() {
+	            this.drawPie1('left1')
+	        })
+	        this.$nextTick(function() {
+	            this.drawPie2('left2')
+	        })
+	        this.$nextTick(function() {
+	            this.drawPie3('left3')
+	        })
+        },
+        drawPie0(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '功能测试',
+		       x:'center',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+               trigger: 'item',
+               formatter: '{a}<br/>{b}:{c} ({d}%)'
+             },
+             legend: {
+               orient: 'vertical',
+               x: 'left',
+               itemWidth: 10,
+               itemGap: 5,
+               data:this.opinionleft0
+             },
+             series: [
+               {
+                 name:'bug等级',
+                 type:'pie',
+                 radius : '55%',
+                 center: ['50%', '60%'],
+                 label: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+	             lableLine: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+                 data:this.opinionDataleft0
+               }
+             ],
+             itemStyle: {
+               emphasis: {
+                 shadowBlur: 10,
+                 shadowOffsetX: 0,
+                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+               }
+             }
+           })
+        },
+        drawPie1(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '代码测试',
+		       x:'center',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+               trigger: 'item',
+               formatter: '{a}<br/>{b}:{c} ({d}%)'
+             },
+             legend: {
+               orient: 'vertical',
+               x: 'left',
+               itemWidth: 10,
+               itemGap: 5,
+               data:this.opinionleft1
+             },
+             series: [
+               {
+                 name:'bug等级',
+                 type:'pie',
+                 radius : '55%',
+                 center: ['50%', '60%'],
+                 label: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+	             lableLine: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+                 data:this.opinionDataleft1
+               }
+             ],
+             itemStyle: {
+               emphasis: {
+                 shadowBlur: 10,
+                 shadowOffsetX: 0,
+                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+               }
+             }
+           })
+        },
+        drawPie2(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '性能测试',
+		       x:'center',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+               trigger: 'item',
+               formatter: '{a}<br/>{b}:{c} ({d}%)'
+             },
+             legend: {
+               orient: 'vertical',
+               x: 'left',
+               itemWidth: 10,
+               itemGap: 5,
+               data:this.opinionleft2
+             },
+             series: [
+               {
+                 name:'bug等级',
+                 type:'pie',
+                 radius : '55%',
+                 center: ['50%', '60%'],
+                 label: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+	             lableLine: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+                 data:this.opinionDataleft2
+               }
+             ],
+             itemStyle: {
+               emphasis: {
+                 shadowBlur: 10,
+                 shadowOffsetX: 0,
+                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+               }
+             }
+           })
+        },
+        drawPie3(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '安全测试',
+		       x:'center',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+               trigger: 'item',
+               formatter: '{a}<br/>{b}:{c} ({d}%)'
+             },
+             legend: {
+               orient: 'vertical',
+               x: 'left',
+               itemWidth: 10,
+               itemGap: 5,
+               data:this.opinionleft3
+             },
+             series: [
+               {
+                 name:'bug等级',
+                 type:'pie',
+                 radius : '55%',
+                 center: ['50%', '60%'],
+                 label: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+	             lableLine: {
+	                normal: {
+	                    show: false
+	                },
+	                emphasis: {
+	                    show: true
+	                }
+	             },
+                 data:this.opinionDataleft3
+               }
+             ],
+             itemStyle: {
+               emphasis: {
+                 shadowBlur: 10,
+                 shadowOffsetX: 0,
+                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+               }
+             }
+           })
+        },
+        onclickright0: function () {
+            this.isonclickright0 = 'primary'
+            this.isonclickright1 = 'ghost'
+            this.Isbaseline = true
+            this.isonclick = false
+
+        },
+        onclickright1: function () {
+            this.isonclickright0 = 'ghost'
+            this.isonclickright1 = 'primary'
+            this.Isbaseline = false
+            this.isonclick = true
+        },
+        drawbar0(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '功能测试bug基线趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip : {
+		        trigger: 'axis',
+		        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+		            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+		        }
+		    },
+		    legend: {
+		        data: this.barlenged0,
+		        top: '15%'
+		    },
+		    grid: {
+		        left: '6%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    xAxis : [
+		        {
+		            type : 'category',
+		            data: this.bardata0,
+					axisLabel: {
+						interval:0,
+						rotate:40
+					},
+		        }
+		    ],    
+		    yAxis : [
+		        {
+		            type : 'value'
+		        }
+		    ],
+		    series : this.barseries0
+		  })
+        }, 
+        drawbar1(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '代码测试bug基线趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip : {
+		        trigger: 'axis',
+		        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+		            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+		        }
+		    },
+		    legend: {
+		        data:this.barlenged1,
+		        top: '15%'
+		    },
+		    grid: {
+		        left: '6%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    xAxis : [
+		        {
+		            type : 'category',
+		            data:this.bardata1,
+					axisLabel: {
+						interval:0,
+						rotate:40
+					},
+		        }
+		    ],    
+		    yAxis : [
+		        {
+		            type : 'value'
+		        }
+		    ],
+		    series : this.barseries1
+		  })
+        },
+        drawbar2(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '性能测试bug基线趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip : {
+		        trigger: 'axis',
+		        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+		            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+		        }
+		    },
+		    legend: {
+		        data:this.barlenged2,
+		        top: '15%'
+		    },
+		    grid: {
+		        left: '6%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    xAxis : [
+		        {
+		            type : 'category',
+		            data:this.bardata2,
+					axisLabel: {
+						interval:0,
+						rotate:40
+					},
+		        }
+		    ],    
+		    yAxis : [
+		        {
+		            type : 'value'
+		        }
+		    ],
+		    series : this.barseries2
+		  })
+        },
+        drawbar3(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '安全测试bug基线趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip : {
+		        trigger: 'axis',
+		        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+		            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+		        }
+		    },
+		    legend: {
+		        data:this.barlenged3,
+		        top: '15%'
+		    },
+		    grid: {
+		        left: '6%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    xAxis : [
+		        {
+		            type : 'category',
+		            data: this.bardata3,
+					axisLabel: {
+						interval:0,
+						rotate:40
+					},
+		        }
+		    ],    
+		    yAxis : [
+		        {
+		            type : 'value'
+		        }
+		    ],
+		    series : this.barseries3
+		  })
+        },
+        drawLine0(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '功能测试bug趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+		        trigger: 'axis'
+		     },
+		     legend: {
+		        data:['累计发现bug数','累计遗留bug数'],
+		        top: '15%'
+		     },
+		     grid: {
+		        left: '4%',
+		        right: '8%',
+		        bottom: '3%',
+		        containLabel: true
+		     },
+		     xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		        data: this.opinionright4
+		     },
+		     yAxis: {
+		        type: 'value'
+		     },
+		     series: this.opinionDataright4
+           })
+        },
+        drawLine1(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '代码测试bug趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+		        trigger: 'axis'
+		     },
+		     legend: {
+		        data:['累计发现bug数','累计遗留bug数'],
+		        top: '15%'
+		     },
+		     grid: {
+		        left: '4%',
+		        right: '8%',
+		        bottom: '3%',
+		        containLabel: true
+		     },
+		     xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		        data: this.opinionright5
+		     },
+		     yAxis: {
+		        type: 'value'
+		     },
+		     series: this.opinionDataright5
+           })
+        },
+        drawLine2(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '性能测试bug趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+		        trigger: 'axis'
+		     },
+		     legend: {
+		        data:['累计发现bug数','累计遗留bug数'],
+		        top: '15%'
+		     },
+		     grid: {
+		        left: '4%',
+		        right: '8%',
+		        bottom: '3%',
+		        containLabel: true
+		     },
+		     xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		        data: this.opinionright6
+		     },
+		     yAxis: {
+		        type: 'value'
+		     },
+		     series: this.opinionDataright6
+           })
+        },
+        drawLine3(id){
+           this.charts = echarts.init(document.getElementById(id))
+           this.charts.setOption({
+           	 title : {
+		       text: '安全测试bug趋势图',
+		       x:'left',
+		       textStyle: {
+		       	 fontSize: 15
+		       }
+		     },
+             tooltip: {
+		        trigger: 'axis'
+		     },
+		     legend: {
+		        data:['累计发现bug数','累计遗留bug数'],
+		        top: '15%'
+		     },
+		     grid: {
+		        left: '4%',
+		        right: '8%',
+		        bottom: '3%',
+		        containLabel: true
+		     },
+		     xAxis: {
+		        type: 'category',
+		        boundaryGap: false,
+		        data: this.opinionright7
+		     },
+		     yAxis: {
+		        type: 'value'
+		     },
+		     series: this.opinionDataright7
+           })
+        },
+        ok () {
+            this.userout()
+        },
+        cancel () {
+            // this.$Message.info('Clicked cancel')
+        },
+        goBack () {
+        	window.location.pathname = 'index.html'
+        },
+        userout: function () {
+	        $.ajax({
+			  type: 'POST',
+			  url: '/api/PTJ/user/logout.do',
+			  contentType: 'text/plain',
+			  success: function(data){
+	            if (data.status === 0) {
+	            	sessionStorage.removeItem('authorityid')
+	            	sessionStorage.removeItem('projectid')
+	            	sessionStorage.removeItem('projectname')
+	            	sessionStorage.removeItem('checkReportDate')
+	            	sessionStorage.removeItem('lastprojectlist')
+	            	sessionStorage.removeItem('allTimelist')
+	            	sessionStorage.removeItem('listTime')
+	            	sessionStorage.removeItem('listdefineTime')
+	            	sessionStorage.removeItem('listgroup')
+	            	sessionStorage.removeItem('listitem')
+	            	window.location.pathname = 'login.html'
+	            }  
+	          },
+	          error: function(){
+	          	console.log('error')
+	          }
+			})
+    	}
+	  }
+	})
+  </script>
+</body>
+</html>
